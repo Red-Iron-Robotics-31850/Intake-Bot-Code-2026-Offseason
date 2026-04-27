@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
-
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.StartEndCommand;
@@ -13,55 +11,61 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter extends SubsystemBase {
 
-    DcMotorEx shooter = hardwareMap.get(DcMotorEx.class, "shooter");
-    //Hardcoded values, until we use AprilTags and LL3G
+    private final DcMotorEx flywheel;
+
+    //Hardcoded Values, until we use AprilTags and LL3G
     private static final double TARGET_RPM = 3000;
-    private static final double TOLERANCE_RPM = 75;
+    private static final double TOLERANCE = 75;
 
-    public Shooter() {
-        shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        shooter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+    public Shooter(HardwareMap hardwareMap) {
+        flywheel = hardwareMap.get(DcMotorEx.class, "shooter");
 
-        /*
-        P: Proportional
-        I: Integral
-        D: Derivative
-        F: Feed-forward Gain
-        
-        YOU MUST TUNE THESE!!
-         */
-        shooter.setVelocityPIDFCoefficients(
+        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+
+        //TUNE\\
+        flywheel.setVelocityPIDFCoefficients(
                 50,
                 0,
                 0,
                 12);
     }
 
-    //Shooter Control\\
+
+    // Flywheel control
 
     public void setVelocity(double rpm) {
-        shooter.setVelocity(rpm);
+        flywheel.setVelocity(rpm);
     }
 
     public void stop() {
-        shooter.setPower(0);
+        flywheel.setPower(0);
     }
 
     public double getVelocity() {
-        return shooter.getVelocity();
+        return flywheel.getVelocity();
     }
 
     public boolean isWithinTolerance(double target) {
-        return Math.abs(getVelocity() - target) < TOLERANCE_RPM;
+        return Math.abs(getVelocity() - target) < TOLERANCE;
     }
 
     // Commands (For buttons)
-    public StartEndCommand manualShoot() {
+
+    // Hold to spin up
+    public StartEndCommand spinUp() {
         return new StartEndCommand(
                 () -> setVelocity(TARGET_RPM),
-                //:: = Method Reference
                 this::stop
         );
     }
 
+
+    // Spin up and wait until ready (useful for autos or logic)
+    public SequentialCommandGroup spinUpUntilReady() {
+        return new SequentialCommandGroup(
+                new InstantCommand(() -> setVelocity(TARGET_RPM)),
+                new WaitUntilCommand(() -> isWithinTolerance(TARGET_RPM))
+        );
+    }
 }
