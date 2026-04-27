@@ -53,19 +53,10 @@ public class Shooter extends SubsystemBase {
     // Commands (For buttons)
 
     // Hold to spin up
-    public StartEndCommand spinUp() {
+    public StartEndCommand shoot() {
         return new StartEndCommand(
                 () -> setVelocity(TARGET_RPM),
                 this::stop
-        );
-    }
-
-
-    // Spin up and wait until ready (useful for autos or logic)
-    public SequentialCommandGroup spinUpUntilReady() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> setVelocity(TARGET_RPM)),
-                new WaitUntilCommand(() -> isWithinTolerance(TARGET_RPM))
         );
     }
 }
