@@ -5,6 +5,7 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Intake extends SubsystemBase {
     public enum Speed {
@@ -12,8 +13,12 @@ public class Intake extends SubsystemBase {
         OUTTAKE,
         STOP
     }
+    private DcMotor motor;
 
-    DcMotor motor = hardwareMap.get(DcMotor.class, "intake");
+    public Intake(HardwareMap hwmap) {
+        motor = hwmap.get(DcMotor.class, "intake");
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
 
     public void set(Speed speed) {
         switch (speed) {
@@ -31,24 +36,16 @@ public class Intake extends SubsystemBase {
 
     public StartEndCommand intakeCommand() {
         return new StartEndCommand(
-                () -> {
-                    set(Speed.INTAKE);
-                },
-                () -> {
-                    set(Speed.STOP);
-                },
+                () -> set(Speed.INTAKE),
+                () -> set(Speed.STOP),
                 this
         );
     }
 
     public StartEndCommand outtakeCommand() {
         return new StartEndCommand(
-                () -> {
-                    set(Speed.OUTTAKE);
-                },
-                () -> {
-                    set(Speed.STOP);
-                },
+                () -> set(Speed.OUTTAKE),
+                () -> set(Speed.STOP),
                 this
         );
     }

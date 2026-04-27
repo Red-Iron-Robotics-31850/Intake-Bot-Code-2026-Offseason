@@ -20,10 +20,11 @@ public class Main extends CommandOpMode {
         driver = new GamepadEx(gamepad1);
         operator = new GamepadEx(gamepad2);
 
-        Intake intake = new Intake();
+        Intake intake = new Intake(hardwareMap);
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1).toggleWhenActive(intake.intakeCommand());
-        new Trigger(() -> operator.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1).whenActive(intake.outtakeCommand());
+        //Change the .toggleWhenActive to .whenActive to see a difference
+        new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.RIGHT_TRIGGER) > 0.1).toggleWhenActive(intake.outtakeCommand());
     }
 
 }
