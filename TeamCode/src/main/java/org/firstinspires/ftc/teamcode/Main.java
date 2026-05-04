@@ -6,6 +6,8 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.subsystems.ArcadeDriveCommand;
+import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 import org.firstinspires.ftc.teamcode.subsystems.Shooter;
 
@@ -23,6 +25,13 @@ public class Main extends CommandOpMode {
 
         Intake intake = new Intake(hardwareMap);
         Shooter shooter = new Shooter(hardwareMap);
+        Drivetrain drive = new Drivetrain(hardwareMap);
+
+        drive.setDefaultCommand(new ArcadeDriveCommand(
+                drive,
+                () -> -driver.getLeftY(),
+                () -> driver.getRightX()
+        ));
 
         new Trigger(() -> driver.getTrigger(GamepadKeys.Trigger.LEFT_TRIGGER) > 0.1).toggleWhenActive(intake.intakeCommand());
         //Change the .toggleWhenActive to .whenActive to see a difference
