@@ -13,7 +13,7 @@ public class Intake extends SubsystemBase {
         OUTTAKE,
         STOP
     }
-    private DcMotor motor;
+    private final DcMotor motor;
 
     public Intake(HardwareMap hwmap) {
         motor = hwmap.get(DcMotor.class, "intake");
