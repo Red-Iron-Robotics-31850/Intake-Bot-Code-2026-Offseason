@@ -11,20 +11,20 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter extends SubsystemBase {
 
-    private final DcMotorEx flywheel;
+    private final DcMotorEx motor;
 
     //Hardcoded Values, until we use AprilTags and LL3G
     private static final double TARGET_RPM = 3000;
     private static final double TOLERANCE = 75;
 
     public Shooter(HardwareMap hardwareMap) {
-        flywheel = hardwareMap.get(DcMotorEx.class, "shooter");
+        motor = hardwareMap.get(DcMotorEx.class, "shooter");
 
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         //TUNE\\
-        flywheel.setVelocityPIDFCoefficients(
+        motor.setVelocityPIDFCoefficients(
                 50,
                 0,
                 0,
@@ -35,15 +35,15 @@ public class Shooter extends SubsystemBase {
     // Flywheel control
 
     public void setVelocity(double rpm) {
-        flywheel.setVelocity(rpm);
+        motor.setVelocity(rpm);
     }
 
     public void stop() {
-        flywheel.setPower(0);
+        motor.setPower(0);
     }
 
     public double getVelocity() {
-        return flywheel.getVelocity();
+        return motor.getVelocity();
     }
 
     public boolean isWithinTolerance(double target) {
@@ -60,12 +60,4 @@ public class Shooter extends SubsystemBase {
         );
     }
 
-
-    // Spin up and wait until ready (useful for autos or logic)
-    public SequentialCommandGroup spinUpUntilReady() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> setVelocity(TARGET_RPM)),
-                new WaitUntilCommand(() -> isWithinTolerance(TARGET_RPM))
-        );
-    }
 }

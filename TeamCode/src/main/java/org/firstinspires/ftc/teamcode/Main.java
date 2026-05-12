@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.teamcode.subsystems.Drivetrain;
 import org.firstinspires.ftc.teamcode.subsystems.Intake;
 
-@TeleOp(name = "Main")
+@TeleOp(name = "Brayden's Main")
 public class Main extends CommandOpMode {
 
     private GamepadEx driver;
@@ -32,8 +32,8 @@ public class Main extends CommandOpMode {
         drive.setDefaultCommand(
                 new RunCommand(
                         () -> drive.arcadeDrive(
-                                -driver.getLeftY(),
-                                driver.getRightX()
+                                -driver.getLeftY(), //drive
+                                driver.getRightX() //turn
                         ),
                         drive
                 )

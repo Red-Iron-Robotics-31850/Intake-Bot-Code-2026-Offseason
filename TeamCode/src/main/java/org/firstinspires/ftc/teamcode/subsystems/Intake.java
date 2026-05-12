@@ -9,11 +9,17 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Intake extends SubsystemBase {
     public enum Speed {
-        INTAKE,
-        OUTTAKE,
-        STOP
+        INTAKE(0.8),
+        OUTTAKE(-0.8),
+        STOP(0);
+
+        private final double percentOutput;
+
+        private Speed(double percentOutput) {
+            this.percentOutput = percentOutput;
+        }
     }
-    private DcMotor motor;
+    private final DcMotor motor;
 
     public Intake(HardwareMap hwmap) {
         motor = hwmap.get(DcMotor.class, "intake");
@@ -21,17 +27,7 @@ public class Intake extends SubsystemBase {
     }
 
     public void set(Speed speed) {
-        switch (speed) {
-            case INTAKE:
-                motor.setPower(0.8);
-                break;
-            case OUTTAKE:
-                motor.setPower(-0.8);
-                break;
-            case STOP:
-                motor.setPower(0.0);
-                break;
-        }
+        motor.setPower(speed.percentOutput);
     }
 
     public StartEndCommand intakeCommand() {
