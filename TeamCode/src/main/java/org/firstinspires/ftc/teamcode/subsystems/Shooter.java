@@ -1,30 +1,32 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-import com.arcrobotics.ftclib.command.InstantCommand;
-import com.arcrobotics.ftclib.command.SequentialCommandGroup;
 import com.arcrobotics.ftclib.command.StartEndCommand;
 import com.arcrobotics.ftclib.command.SubsystemBase;
-import com.arcrobotics.ftclib.command.WaitUntilCommand;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class Shooter extends SubsystemBase {
 
-    private final DcMotorEx flywheel;
+    private final DcMotorEx motor;   /*
+                                     provides enhanced motor functionality
+                                     which is available with some hardware
+                                     devices.
+                                     */
 
     //Hardcoded Values, until we use AprilTags and LL3G
     private static final double TARGET_RPM = 3000;
     private static final double TOLERANCE = 75;
+    public double TPS = 2520;
 
     public Shooter(HardwareMap hardwareMap) {
-        flywheel = hardwareMap.get(DcMotorEx.class, "shooter");
+        motor = hardwareMap.get(DcMotorEx.class, "shooter");
 
-        flywheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        flywheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT); //Coast Mode
 
         //TUNE\\
-        flywheel.setVelocityPIDFCoefficients(
+        motor.setVelocityPIDFCoefficients(
                 50,
                 0,
                 0,
@@ -34,38 +36,38 @@ public class Shooter extends SubsystemBase {
 
     // Flywheel control
 
-    public void setVelocity(double rpm) {
-        flywheel.setVelocity(rpm);
+    public void setRPM(double rpm) {
+        motor.setVelocity((TPS * 60) / 28); //TPS -> RPM
     }
 
     public void stop() {
-        flywheel.setPower(0);
+        motor.setPower(0); //Stops the motor
     }
 
     public double getVelocity() {
-        return flywheel.getVelocity();
+        return motor.getVelocity(); //Used for tolerance things
     }
 
-    public boolean isWithinTolerance(double target) {
-        return Math.abs(getVelocity() - target) < TOLERANCE;
+    public boolean isWithinTolerance(double target) { //Tests for whether the shooter is within the set RPM.
+        return Math.abs(target - getVelocity()) < TOLERANCE;
     }
 
     // Commands (For buttons)
 
     // Hold to spin up
-    public StartEndCommand spinUp() {
+    public StartEndCommand shoot() {
         return new StartEndCommand(
-                () -> setVelocity(TARGET_RPM),
+                () -> setRPM(TARGET_RPM),
                 this::stop
         );
     }
 
 
     // Spin up and wait until ready (useful for autos or logic)
-    public SequentialCommandGroup spinUpUntilReady() {
-        return new SequentialCommandGroup(
-                new InstantCommand(() -> setVelocity(TARGET_RPM)),
-                new WaitUntilCommand(() -> isWithinTolerance(TARGET_RPM))
-        );
-    }
+//    public SequentialCommandGroup spinUpUntilReady() {
+//        return new SequentialCommandGroup(
+//                new InstantCommand(() -> setRPM(TARGET_RPM)),
+//                new WaitUntilCommand(() -> isWithinTolerance(TARGET_RPM))
+//        );
+//    }
 }
